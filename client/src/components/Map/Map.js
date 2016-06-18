@@ -1,5 +1,3 @@
-/* global google */
-
 // webpack specific - including required JS and CSS files
 import './map.less';
 import '../../../../node_modules/openlayers/dist/ol-debug.css';
@@ -9,6 +7,7 @@ import {
   HEATMAP_LAYER_NAME,
   CLUSTER_LAYER_NAME
 } from '../../reducers/map.js';
+import { numberToColorHsl } from '../../utils/utils.js';
 
 const epsg4326 = 'EPSG:4326';
 const epsg3857 = 'EPSG:3857';
@@ -76,12 +75,16 @@ class Map extends Component {
 
     // re-render heatmap only if search was changed
     if (prevProps.searchUUID !== searchUUID) {
-      const vectorSource = this._getMapVectorSource(tweets);
-      this._heatMapLayer.setSource(vectorSource);
-      this._clusterLayer.setSource(new ol.source.Cluster({
+      let vectorSource = this._getMapVectorSource(tweets);
+      let clusterSource = new ol.source.Cluster({
         source: vectorSource,
         distance: 40
-      }));
+      });
+
+      clusterSource.on('change', this._onClusterLayerChange);
+
+      this._heatMapLayer.setSource(vectorSource);
+      this._clusterLayer.setSource(clusterSource);
     }
 
     // show-hide layers
@@ -131,38 +134,54 @@ class Map extends Component {
     });
   };
 
-  _createClusterLayer = () => {
+  _onClusterLayerChange = (event) => {
+    const features = event.target.getFeatures();
+    if (!features.length) {
+      return;
+    }
+
+    const clusterSizes = features
+      .map(feature => feature.get('features').length);
+    const max = Math.max(...clusterSizes);
+    const min = Math.min(...clusterSizes);
+
     let styleCache = {};
-    return new ol.layer.Vector({
-      title: CLUSTER_LAYER_NAME,
-      style: feature => {
-        // TBD: change radius and color based on how many tweets are there
-        const size = feature.get('features').length;
-        let style = styleCache[size];
-        if (!style) {
-          style = new ol.style.Style({
-            image: new ol.style.Circle({
-              radius: 12,
-              stroke: new ol.style.Stroke({
-                color: 'rgba(51, 153, 204, 0.5)',
-                width: 10
-              }),
-              fill: new ol.style.Fill({
-                color: 'rgb(51, 153, 204)'
-              })
+    this._clusterLayer.setStyle(feature => {
+      // TBD: change radius and color based on how many tweets are there
+      const size = feature.get('features').length;
+      const radius = 12 + (5 * size / max);
+      const iColor = (100 * size / max);
+      const colorStroke = numberToColorHsl(iColor, 0.5);
+      const colorFill = numberToColorHsl(iColor);
+      let style = styleCache[size];
+      if (!style) {
+        style = new ol.style.Style({
+          image: new ol.style.Circle({
+            radius,
+            stroke: new ol.style.Stroke({
+              color: colorStroke,
+              width: 10
             }),
-            text: new ol.style.Text({
-              text: size.toString(),
-              fill: new ol.style.Fill({
-                color: '#fff'
-              })
+            fill: new ol.style.Fill({
+              color: colorFill
             })
-          });
-          styleCache[size] = style;
-        }
-        return style;
+          }),
+          text: new ol.style.Text({
+            text: size.toString(),
+            fill: new ol.style.Fill({
+              color: '#fff'
+            })
+          })
+        });
+        styleCache[size] = style;
       }
+
+      return style;
     });
+  };
+
+  _createClusterLayer = () => {
+    return new ol.layer.Vector({ title: CLUSTER_LAYER_NAME });
   };
 
   _createSelectCircleLayer = () => {

@@ -21,7 +21,7 @@ const initialState = {
       value: 2
     }
   ],
-  selectedLayer: 1
+  selectedLayer: 2
 };
 
 export default function map(state = initialState, action) {
