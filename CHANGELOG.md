@@ -1,3 +1,14 @@
+## 0.6.0
+###### ????
+
+##### Client
+- [Map] Now cluster circle size and color depends on the number of features within the cluster (#93)
+- [Map] By default Cluster layer is the default layer to be shown
+- [SlidePanel] Layers are sorted alphabetically: Cluster Layer, Heatmap Layer
+
+##### Depreceated
+- [Core] /* global google */ is no longer in files
+
 ## 0.5.0
 ###### _May 30, 2016_
 

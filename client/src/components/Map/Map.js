@@ -7,7 +7,7 @@ import {
   HEATMAP_LAYER_NAME,
   CLUSTER_LAYER_NAME
 } from '../../reducers/map.js';
-import { numberToColorHsl } from '../../utils/utils.js';
+import { percentageToHsl } from '../../utils/utils.js';
 
 const epsg4326 = 'EPSG:4326';
 const epsg3857 = 'EPSG:3857';
@@ -20,8 +20,8 @@ class Map extends Component {
 
     // Layers
     this._rasterLayer = this._createTileLayer();
-    this._heatMapLayer = this._createHeatMapLayer();
     this._clusterLayer = this._createClusterLayer();
+    this._heatMapLayer = this._createHeatMapLayer();
     this._selectCircleLayer = this._createSelectCircleLayer();
 
     // overlay popup
@@ -41,8 +41,8 @@ class Map extends Component {
       overlays: [this._popupOverlay],
       layers: [
         this._rasterLayer,
-        this._heatMapLayer,
         this._clusterLayer,
+        this._heatMapLayer,
         this._selectCircleLayer
       ],
       view: new ol.View({
@@ -83,8 +83,8 @@ class Map extends Component {
 
       clusterSource.on('change', this._onClusterLayerChange);
 
-      this._heatMapLayer.setSource(vectorSource);
       this._clusterLayer.setSource(clusterSource);
+      this._heatMapLayer.setSource(vectorSource);
     }
 
     // show-hide layers
@@ -149,10 +149,20 @@ class Map extends Component {
     this._clusterLayer.setStyle(feature => {
       // TBD: change radius and color based on how many tweets are there
       const size = feature.get('features').length;
-      const radius = 12 + (5 * size / max);
-      const iColor = (100 * size / max);
-      const colorStroke = numberToColorHsl(iColor, 0.5);
-      const colorFill = numberToColorHsl(iColor);
+      const percentage = (size / max);
+      const radius = 12 + (5 * percentage);
+      const hslColor = {
+        percentage,
+        hue0: 120,
+        hue1: 20,
+        saturation: 75,
+        lightness: 48
+      };
+      const colorStroke = percentageToHsl({
+        ...hslColor,
+        transparency: 0.5
+      });
+      const colorFill = percentageToHsl({ ...hslColor });
       let style = styleCache[size];
       if (!style) {
         style = new ol.style.Style({

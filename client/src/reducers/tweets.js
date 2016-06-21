@@ -1,5 +1,3 @@
-/* global google */
-
 import * as types from '../constants/actionTypes.js';
 
 const initialState = {
