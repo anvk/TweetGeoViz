@@ -1,9 +1,7 @@
-/* global google */
-
 import * as types from '../constants/actionTypes.js';
 
-export const HEATMAP_LAYER_NAME = 'HeatMap';
 export const CLUSTER_LAYER_NAME = 'Clusters';
+export const HEATMAP_LAYER_NAME = 'HeatMap';
 
 const initialState = {
   lonLat: [0, 0],
@@ -13,11 +11,11 @@ const initialState = {
   clickRadius: 250,
   layers: [
     {
-      label: HEATMAP_LAYER_NAME,
+      label: CLUSTER_LAYER_NAME,
       value: 1
     },
     {
-      label: CLUSTER_LAYER_NAME,
+      label: HEATMAP_LAYER_NAME,
       value: 2
     }
   ],
