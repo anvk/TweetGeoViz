@@ -22,7 +22,7 @@ A product of collaboration between HealthMap.org (Boston Children's Hospital), M
 ## Dependencies
 This project uses mongodb to manage its database, node.js for a server, and npm to manage dependencies. Install these on your machine to start:
 
- - [MongoDB v2.6.4 and higher](http://docs.mongodb.org/manual/installation/)
+ - [MongoDB v3.2.7 and higher](http://docs.mongodb.org/manual/installation/)
  - [Node v0.12.7 and higher](http://nodejs.org/download/) (comes with npm)
  - [Control Tweets](https://db.tt/29prxPri) (courtesy of HealthMap)
 
@@ -76,7 +76,7 @@ then navigate to the `twitter` database you created, index it based on tweets, a
 
 ```
 use twitter
-db.ControlTweets.ensureIndex({ t: "text" })
+db.ControlTweets.createIndex({ t: "text”, cr: 1 })
 exit
 ```
 

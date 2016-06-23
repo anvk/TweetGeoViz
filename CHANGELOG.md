@@ -1,6 +1,10 @@
 ## 0.6.0
 ###### ????
 
+##### General
+- [Docs] Mention MongoDB version 3.2.7 as opposed to 2.6.4 since older version of Mongo has a default batch size of 1000 (#92)
+- [Core] New index { t: "text”, cr: 1 } on text and on date to speed up queries
+
 ##### Client
 - [Map] Now cluster circle size and color depends on the number of features within the cluster (#93)
 - [Map] By default Cluster layer is the default layer to be shown
