@@ -1,6 +1,6 @@
 {
   "name": "TweetGeoViz",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Visualization tool to view tweets by location and content.",
   "author": "Jared Hawkins",
   "contributors": [
